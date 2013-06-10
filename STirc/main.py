@@ -1,5 +1,6 @@
-import wx
+#!usr/bin/python
 
+import wx
 
 class MainScreen(wx.Frame):
     
