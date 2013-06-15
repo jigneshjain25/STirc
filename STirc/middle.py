@@ -1,4 +1,4 @@
-#!user/bin/python
+#!usr/bin/python
 
 import wx
 from ServerRTC import ServerRTC
@@ -7,7 +7,7 @@ class middle(wx.Panel):
     def __init__(self,parent,id,size):
         wx.Panel.__init__(self,parent,id,size)        
         self.parent = parent        
-
+        
         self.SetSize(size)        
 
         self.vbox = wx.BoxSizer(wx.VERTICAL)

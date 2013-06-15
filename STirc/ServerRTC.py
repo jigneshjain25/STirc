@@ -10,7 +10,7 @@ class ServerRTC(RichTextCtrl):
         super(ServerRTC,self).__init__(parent,*args,**kwargs)
         self.Hide()
         self.GetCaret().Hide()         
-        self.SetSize((1050,954))
+        self.SetSize(wx.GetDisplaySize())
         self.SetEditable(False)        
         self.parent=parent
         self.domain=domain
