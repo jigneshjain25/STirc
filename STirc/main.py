@@ -1,20 +1,69 @@
 #!usr/bin/python
 
 import wx
+from middle import middle 
+from right import Right
+from ServerRTC import ServerRTC
+from ChannelRTC import ChannelRTC
+
+MAIN_SCREEN_WIDTH = 700
+MAIN_SCREEN_HEIGHT = 500
+
+ID_MAIN_SCREEN = 50
+ID_LEFT = 100
+ID_MIDDLE = 200
+ID_RIGHT = 300
+ID_SPLITTER1 = 400
+ID_SPLITTER2 = 500
 
 class MainScreen(wx.Frame):
     
     def __init__(self, *args, **kwargs):
-        super(MainScreen, self).__init__(*args, **kwargs) 
-            
+        super(MainScreen, self).__init__(*args, **kwargs)
+
+        self.server_list = []    
+
         self.InitUI()
         
-    def InitUI(self):    
+    def InitUI(self):
+
+        self.SetSize((MAIN_SCREEN_WIDTH,MAIN_SCREEN_HEIGHT))        
+        self.SetTitle('STirc - connecting chatters')                
 
         self.CreateMenuBar()
 
-        self.SetSize((700, 500))
-        self.SetTitle('About dialog box')
+        self.splitter1 = wx.SplitterWindow(self,ID_SPLITTER1)
+        self.splitter1.SetMinimumPaneSize(110)
+
+        self.splitter2 = wx.SplitterWindow(self.splitter1,ID_SPLITTER2)     
+        self.splitter2.SetMinimumPaneSize(110)
+        self.splitter2.SetSashGravity(1.0)
+
+        self.channel_list = wx.TreeCtrl(self.splitter1,ID_LEFT,style=wx.TR_HIDE_ROOT|wx.SUNKEN_BORDER|wx.TR_HAS_BUTTONS)
+
+        self.channel_list.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnChannelChanged, id=-1)
+        
+        self.root = self.channel_list.AddRoot("ChannelList")    
+
+        self.middle = middle(self.splitter2,ID_MIDDLE,(594,450))        
+        self.server_list.append(self.AddServerRoot(self.root,ServerRTC(self.middle.chat_panel,'irc.DejaToons.net',6667)))
+        self.AddChannelNode(self.server_list[0],ChannelRTC(self.middle.chat_panel,'vjtians','.less','gaurav'))
+        self.AddChannelNode(self.server_list[0],ChannelRTC(self.middle.chat_panel,'scraggy','Pokemon','gaurav'))        
+        self.server_list.append(self.AddServerRoot(self.root,ServerRTC(self.middle.chat_panel,'irc.FreeNode.net',6667)))
+        self.AddChannelNode(self.server_list[1],ChannelRTC(self.middle.chat_panel,'boost','Maths','gaurav'))
+        self.AddChannelNode(self.server_list[1],ChannelRTC(self.middle.chat_panel,'gsoc','Coding','gaurav'))        
+        
+        self.channel_list.ExpandAll()        
+        
+        self.right = Right(self.splitter2,ID_RIGHT)          
+        
+        self.splitter1.SplitVertically(self.channel_list,self.splitter2,20)
+        self.splitter2.SplitVertically(self.middle ,self.right,600)                   
+
+        #self.middle.SetChatWindow(self.channel_list.GetPyData(self.server_list[2]))  
+        #self.middle.SetChatWindow(self.channel_list.GetPyData(self.server_list[1]))  
+        #self.middle.SetChatWindow(self.channel_list.GetPyData(self.server_list[0]))        
+
         self.Centre()
         self.Show(True)
 
@@ -35,11 +84,23 @@ class MainScreen(wx.Frame):
     	menubar.Append(filemenu,'&File')
     	menubar.Append(helpmenu,'&Help')
 
-    	self.SetMenuBar(menubar)
+    	self.SetMenuBar(menubar)    
+
+    def AddChannelNode(self,parent_item,item):
+        idx = self.channel_list.AppendItem(parent_item,item.name)    #item.name                
+        self.channel_list.SetPyData(idx,item)
+
+    def AddServerRoot(self,parent_item,item):        
+        idx = self.channel_list.AppendItem(parent_item,item.name)    #item.name                
+        self.channel_list.SetPyData(idx,item)        
+        return idx
 
     def OnQuit(self,e):
     	self.Destroy()
 
+    def OnChannelChanged(self,e):
+        item = e.GetItem()        
+        self.middle.SetChatWindow(self.channel_list.GetPyData(item))
 
     def OnAboutBox(self, e):
         
