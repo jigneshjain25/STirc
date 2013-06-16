@@ -8,9 +8,9 @@ class ServerRTC(RichTextCtrl):
 
     def __init__(self,parent,domain,port,*args,**kwargs):
         super(ServerRTC,self).__init__(parent,*args,**kwargs)
-        self.Hide()
-        self.GetCaret().Hide()         
-        self.SetSize(wx.GetDisplaySize())
+        #self.Hide()
+        #self.GetCaret().Hide()         
+        #self.SetSize(wx.GetDisplaySize())
         self.SetEditable(False)        
         self.parent=parent
         self.domain=domain
@@ -18,7 +18,7 @@ class ServerRTC(RichTextCtrl):
         self.topic_name=''
         self.port=port
         self.connected=False
-        self.SetValue(self.domain)
+        #self.SetValue(self.domain)
 
     def makeConnection(self):
         f=open("UserInfo.txt","r")
@@ -54,8 +54,20 @@ class ServerRTC(RichTextCtrl):
                 self.ShowPosition(self.GetLastPosition())
         
     def joinChannel(self):
-        while not self.connected:
-            pass
         channelName='#vjtians'
         self.sck.send('JOIN %s\r\n' %(channelName))       
 #       self.channels[channelName]=Channel(self,channelname)
+
+if __name__ == '__main__':
+    app=wx.App()
+    frame=wx.Frame(None)
+    frame.Maximize()
+    dejatoons=ServerRTC(frame,'irc.dejatoons.net',6667,style=wx.TE_MULTILINE)
+    t=threading.Thread(target=dejatoons.makeConnection)
+    t.daemon=True
+    t1=threading.Thread(target=dejatoons.joinChannel)
+    t1.daemon=True
+    t.start()
+    #t1.start()
+    frame.Show()
+    app.MainLoop()
