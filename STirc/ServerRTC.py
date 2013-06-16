@@ -7,7 +7,7 @@ class ServerRTC(RichTextCtrl):
 
     def __init__(self,parent,domain,port,name,fc=[],*args,**kwargs):
         super(ServerRTC,self).__init__(parent,*args,**kwargs)
-        self.Hide()
+        #self.Hide()
         self.GetCaret().Hide()         
         self.SetSize(wx.GetDisplaySize())
         self.SetEditable(False)        
@@ -30,7 +30,7 @@ class ServerRTC(RichTextCtrl):
         self.factory = STircFactory(self,nickname)
         self.factory.setFavChannels(self.fc)
         reactor.connectTCP(self.domain,self.port,self.factory)
-        reactor.run()
+        reactor.run(installSignalHandlers=0)   #required to solve signal only works in main thread error
 
 '''
         #print username,realname,nickname
@@ -82,3 +82,16 @@ if __name__ == '__main__':
                 self.sck.send('NICK %s\r\n' %(nickname))
                 self.sck.send('USER %s STirc STirc %s\r\n' %(username,realname))   
 '''
+
+
+
+if __name__ == '__main__':
+    app = wx.App()
+    frame = wx.Frame(None)
+    frame.Maximize()
+    s = ServerRTC(frame,'irc.dejatoons.net',6667,'Dejatoons',['#vjtians'])
+    t = threading.Thread(target = s.makeConnection)
+    t.start()
+    frame.Show()
+    app.MainLoop()
+
