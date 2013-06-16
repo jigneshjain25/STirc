@@ -24,6 +24,7 @@ class ServerRTC(RichTextCtrl):
         f=open("UserInfo.txt","r")
         username=f.readline().rstrip()
         nickname=f.readline().rstrip()
+        nickname = "lol"
         realname=f.readline().rstrip()
         f.close()
         #print username,realname,nickname
