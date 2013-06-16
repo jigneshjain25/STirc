@@ -1,6 +1,7 @@
 #!usr/bin/python
 
 import wx
+import threading
 from middle import middle 
 from right import Right
 from ServerRTC import ServerRTC
@@ -58,14 +59,18 @@ class MainScreen(wx.Frame):
         self.right = Right(self.splitter2,ID_RIGHT)          
         
         self.splitter1.SplitVertically(self.channel_list,self.splitter2,20)
-        self.splitter2.SplitVertically(self.middle ,self.right,600)                   
-
-        #self.middle.SetChatWindow(self.channel_list.GetPyData(self.server_list[2]))  
-        #self.middle.SetChatWindow(self.channel_list.GetPyData(self.server_list[1]))  
-        #self.middle.SetChatWindow(self.channel_list.GetPyData(self.server_list[0]))        
+        self.splitter2.SplitVertically(self.middle ,self.right,600)                       
 
         self.Centre()
         self.Show(True)
+        
+        dejatoons=self.channel_list.GetPyData(self.server_list[0])
+        try:
+            t=threading.Thread(target=dejatoons.makeConnection)
+            t.daemon=True
+            t.start()
+        except:
+            print "Error"
 
     def CreateMenuBar(self):
 
@@ -100,7 +105,7 @@ class MainScreen(wx.Frame):
 
     def OnChannelChanged(self,e):
         item = e.GetItem()        
-        self.middle.SetChatWindow(self.channel_list.GetPyData(item))
+        self.middle.SetChatWindow(self.channel_list.GetPyData(item))        
 
     def OnAboutBox(self, e):
         

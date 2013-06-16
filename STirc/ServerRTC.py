@@ -1,24 +1,17 @@
 from wx.richtext import RichTextCtrl
 import wx,threading,socket,string,time
+from STircFactory import STircFactory
+from twisted.internet import reactor
 
 class ServerRTC(RichTextCtrl):
     '''
     self.sck,domain, name, connected, channels
-    '''
-    def keepchecking(self):
-        while True:
-            time.sleep(300)
-            if not self.connected:
-                self.AppendText("Disconnected.(Ping Timeout)")
-            else:
-                self.connected=False
-                
- 
+    '''     
     def __init__(self,parent,domain,port,*args,**kwargs):
         super(ServerRTC,self).__init__(parent,*args,**kwargs)
-        #self.Hide()
-        #self.GetCaret().Hide()         
-        #self.SetSize(wx.GetDisplaySize())
+        self.Hide()
+        self.GetCaret().Hide()         
+        self.SetSize(wx.GetDisplaySize())
         self.SetEditable(False)        
         self.parent=parent
         self.domain=domain
@@ -26,16 +19,22 @@ class ServerRTC(RichTextCtrl):
         self.topic_name=''
         self.port=port
         self.connected=False
-        #self.SetValue(self.domain)
+        self.SetValue(self.domain)
 
     def makeConnection(self):
-        pingTimeout=threading.Thread(target=self.keepchecking)
-        pingTimeout.start();
+        #pingTimeout=threading.Thread(target=self.keepchecking)
+        #pingTimeout.start();
         f=open("UserInfo.txt","r")
         username=f.readline().rstrip()
         nickname=f.readline().rstrip()
         realname=f.readline().rstrip()
         f.close()
+
+        self.factory = STircFactory(self,nickname)
+        reactor.connectTCP('irc.dejatoons.net',6667,self.factory)
+        reactor.run()
+
+        '''
         #print username,realname,nickname
         self.sck = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sck.connect((self.domain,self.port))
@@ -44,7 +43,7 @@ class ServerRTC(RichTextCtrl):
 
         while True:
             data=self.sck.recv(1024)
-            #print data
+            print data
             if data.find('PING') != -1:
                 self.sck.send('PONG ' + data.split() [1] + '\r\n')
                 self.connected=1
@@ -60,13 +59,14 @@ class ServerRTC(RichTextCtrl):
                 #self.channels[channel].WriteText(sender,content)
             else:
                 self.AppendText(data)
-                #self.ShowPosition(self.GetLastPosition())
-        
+                self.ShowPosition(self.GetLastPosition())
+        '''
+
     def joinChannel(self):
         channelName='#vjtians'
         self.sck.send('JOIN %s\r\n' %(channelName))       
 #       self.channels[channelName]=Channel(self,channelname)
-
+'''
 if __name__ == '__main__':
     app=wx.App()
     frame=wx.Frame(None)
@@ -80,9 +80,8 @@ if __name__ == '__main__':
     #t1.start()
     frame.Show()
     app.MainLoop()
-    '''
             elif data.find('Nickname already in use')!=-1:
                 nickname = nickname+'_'
                 self.sck.send('NICK %s\r\n' %(nickname))
-                self.sck.send('USER %s STirc STirc %s\r\n' %(username,realname))
-    '''
+                self.sck.send('USER %s STirc STirc %s\r\n' %(username,realname))   
+'''
