@@ -1,0 +1,1 @@
+STIRC -- SuttitTech IRC Client

@@ -18,7 +18,7 @@ class middle(wx.Panel):
 
         self.chat_panel = wx.Panel(self,size=(-1,-1),id=-1)
         self.box = wx.BoxSizer(wx.HORIZONTAL)        
-        self.chat_window = ServerRTC(self.chat_panel,'irc.tp.net',6667)        
+        self.chat_window = ServerRTC(self.chat_panel,'irc.tp.net',6667,'Dejatoons')        
         self.box.Add(self.chat_window,proportion=1,flag=wx.EXPAND|wx.ALL,border=1)     
         self.chat_panel.SetSizerAndFit(self.box)  
         self.vbox.Add(self.chat_panel,1,flag=wx.LEFT|wx.RIGHT|wx.EXPAND,border=0)		

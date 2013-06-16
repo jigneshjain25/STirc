@@ -8,12 +8,14 @@ class STirc(irc.IRCClient):
     nickname = property(_get_nickname)
 
     def signedOn(self):
-        #self.join(self.factory.channel)
+        for cha in self.factory.favchan:
+            self.join(cha)
         print "Signed on as %s." % (self.nickname,)        
 
     def joined(self, channel):
         print "Joined %s." % (channel,)
 
+    
     def privmsg(self, user, channel, msg):
         print msg
         print type(self.factory.parent)
@@ -25,7 +27,7 @@ class STirc(irc.IRCClient):
         for param in params:
             print param             
             self.factory.parent.AppendText(param+'\n')
-
+    
     #def dataReceived(self, line):
         #pass
 
@@ -35,6 +37,7 @@ class STircFactory(protocol.ClientFactory):
     def __init__(self,parent ,nickname='twistedTrial'):        
         self.nickname = nickname
         self.parent = parent
+        self.favchan = []
 
     def buildProtocol(self, address):
         proto = protocol.ClientFactory.buildProtocol(self, address)
@@ -48,9 +51,13 @@ class STircFactory(protocol.ClientFactory):
     def clientConnectionFailed(self, connector, reason):
         print "Could not connect: %s" % (reason,)    
 
+    def setFavChannels(self,list):
+        self.favchan = list
+
 if __name__=="__main__":
-    chan = 'vjtians'    
-    factory = STircFactory()
+    factory = STircFactory(None,"TomRiddle")
+    mylist = ['#vjtians','#tp','nonsense']
+    factory.setFavChannels(mylist)
     connector = reactor.connectTCP('irc.dejatoons.net',6667,factory)
     reactor.run()  
     print factory.connectedProtocol._get_nickname()  

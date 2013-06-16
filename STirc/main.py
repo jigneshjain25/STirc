@@ -47,10 +47,10 @@ class MainScreen(wx.Frame):
         self.root = self.channel_list.AddRoot("ChannelList")    
 
         self.middle = middle(self.splitter2,ID_MIDDLE,(594,450))        
-        self.server_list.append(self.AddServerRoot(self.root,ServerRTC(self.middle.chat_panel,'irc.DejaToons.net',6667)))
+        self.server_list.append(self.AddServerRoot(self.root,ServerRTC(self.middle.chat_panel,'irc.DejaToons.net',6667,'Dejatoons')))
         self.AddChannelNode(self.server_list[0],ChannelRTC(self.middle.chat_panel,'vjtians','.less','gaurav'))
         self.AddChannelNode(self.server_list[0],ChannelRTC(self.middle.chat_panel,'scraggy','Pokemon','gaurav'))        
-        self.server_list.append(self.AddServerRoot(self.root,ServerRTC(self.middle.chat_panel,'irc.FreeNode.net',6667)))
+        self.server_list.append(self.AddServerRoot(self.root,ServerRTC(self.middle.chat_panel,'irc.FreeNode.net',6667,'FreeNode')))
         self.AddChannelNode(self.server_list[1],ChannelRTC(self.middle.chat_panel,'boost','Maths','gaurav'))
         self.AddChannelNode(self.server_list[1],ChannelRTC(self.middle.chat_panel,'gsoc','Coding','gaurav'))        
         

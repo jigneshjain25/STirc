@@ -4,10 +4,8 @@ from STircFactory import STircFactory
 from twisted.internet import reactor
 
 class ServerRTC(RichTextCtrl):
-    '''
-    self.sck,domain, name, connected, channels
-    '''     
-    def __init__(self,parent,domain,port,*args,**kwargs):
+
+    def __init__(self,parent,domain,port,name,fc=[],*args,**kwargs):
         super(ServerRTC,self).__init__(parent,*args,**kwargs)
         self.Hide()
         self.GetCaret().Hide()         
@@ -15,15 +13,14 @@ class ServerRTC(RichTextCtrl):
         self.SetEditable(False)        
         self.parent=parent
         self.domain=domain
-        self.name=self.domain.split('.')[1]
+        self.name=name
         self.topic_name=''
         self.port=port
+        self.fc=fc
         self.connected=False
         self.SetValue(self.domain)
 
     def makeConnection(self):
-        #pingTimeout=threading.Thread(target=self.keepchecking)
-        #pingTimeout.start();
         f=open("UserInfo.txt","r")
         username=f.readline().rstrip()
         nickname=f.readline().rstrip()
@@ -31,10 +28,11 @@ class ServerRTC(RichTextCtrl):
         f.close()
 
         self.factory = STircFactory(self,nickname)
-        reactor.connectTCP('irc.dejatoons.net',6667,self.factory)
+        self.factory.setFavChannels(self.fc)
+        reactor.connectTCP(self.domain,self.port,self.factory)
         reactor.run()
 
-        '''
+'''
         #print username,realname,nickname
         self.sck = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sck.connect((self.domain,self.port))
@@ -60,13 +58,12 @@ class ServerRTC(RichTextCtrl):
             else:
                 self.AppendText(data)
                 self.ShowPosition(self.GetLastPosition())
-        '''
 
     def joinChannel(self):
         channelName='#vjtians'
         self.sck.send('JOIN %s\r\n' %(channelName))       
 #       self.channels[channelName]=Channel(self,channelname)
-'''
+
 if __name__ == '__main__':
     app=wx.App()
     frame=wx.Frame(None)
