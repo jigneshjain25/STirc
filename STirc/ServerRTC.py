@@ -1,11 +1,19 @@
 from wx.richtext import RichTextCtrl
-import wx,threading,socket,string
+import wx,threading,socket,string,time
 
 class ServerRTC(RichTextCtrl):
     '''
     self.sck,domain, name, connected, channels
     '''
-
+    def keepchecking(self):
+        while True:
+            time.sleep(300)
+            if not self.connected:
+                self.AppendText("Disconnected.(Ping Timeout)")
+            else:
+                self.connected=False
+                
+ 
     def __init__(self,parent,domain,port,*args,**kwargs):
         super(ServerRTC,self).__init__(parent,*args,**kwargs)
         #self.Hide()
@@ -21,10 +29,11 @@ class ServerRTC(RichTextCtrl):
         #self.SetValue(self.domain)
 
     def makeConnection(self):
+        pingTimeout=threading.Thread(target=self.keepchecking)
+        pingTimeout.start();
         f=open("UserInfo.txt","r")
         username=f.readline().rstrip()
         nickname=f.readline().rstrip()
-        nickname = "lol"
         realname=f.readline().rstrip()
         f.close()
         #print username,realname,nickname
@@ -38,8 +47,7 @@ class ServerRTC(RichTextCtrl):
             #print data
             if data.find('PING') != -1:
                 self.sck.send('PONG ' + data.split() [1] + '\r\n')
-                if not self.connected:
-	    		    self.connected=1
+                self.connected=1
             elif data.find('PRIVMSG')!=-1 :
                 msg=string.split(data,':')
                 sender=msg[1][0:msg[1].find("!")]
@@ -51,8 +59,8 @@ class ServerRTC(RichTextCtrl):
                 print '------------------'
                 #self.channels[channel].WriteText(sender,content)
             else:
-                self.WriteText(data)
-                self.ShowPosition(self.GetLastPosition())
+                self.AppendText(data)
+                #self.ShowPosition(self.GetLastPosition())
         
     def joinChannel(self):
         channelName='#vjtians'
@@ -72,3 +80,9 @@ if __name__ == '__main__':
     #t1.start()
     frame.Show()
     app.MainLoop()
+    '''
+            elif data.find('Nickname already in use')!=-1:
+                nickname = nickname+'_'
+                self.sck.send('NICK %s\r\n' %(nickname))
+                self.sck.send('USER %s STirc STirc %s\r\n' %(username,realname))
+    '''
