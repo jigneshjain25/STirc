@@ -9,7 +9,9 @@ from time import strftime, localtime
 class ChannelRTC (wx.richtext.RichTextCtrl):
     def __init__ (self,parent ,cname, tname, nick, *args, **kwargs):
         super(ChannelRTC,self).__init__(parent,*args,**kwargs)
-        self.SetSize(wx.GetDisplaySize())
+        print "Inside channel rtc"
+        self.Hide()
+        self.SetSize(wx.GetDisplaySize())        
         self.RedColor = wx.Color(255, 0, 0)
         self.SelfColor = wx.Color(96, 96, 96)
         self.ServerColor = wx.Color(0, 255, 0)

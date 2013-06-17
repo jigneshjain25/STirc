@@ -1,6 +1,7 @@
 from twisted.words.protocols import irc
 from twisted.internet import protocol
 from twisted.internet import reactor
+from ChannelRTC import ChannelRTC
 
 class STirc(irc.IRCClient):
     def _get_nickname(self):
@@ -12,9 +13,17 @@ class STirc(irc.IRCClient):
             self.join(cha)
         print "Signed on as %s." % (self.nickname,)        
 
-    def joined(self, channel):
+    def joined(self, channel):        
         print "Joined %s." % (channel,)
+        MainScreen = self.factory.parent.MainScreen
+        srtc = self.factory.parent        
+        crtc = ChannelRTC(MainScreen.middle.chat_panel,channel,'newTopic','gaurav')            
+        MainScreen.AddChannelNode(MainScreen.AddChannelNode(srtc.TreeItemId,crtc))
+        MainScreen.middle.SetChatWindow(crtc)
 
+    def topicUpdated(self,user,channel,newTopic):
+        print "%s set topic '%s'" % (user,newTopic,)
+        print "%s %s %s" % (channel,newTopic,self.nickname)        
     
     def privmsg(self, user, channel, msg):
         print msg
@@ -22,14 +31,10 @@ class STirc(irc.IRCClient):
         self.factory.parent.AppendText(msg)
 
     def irc_NOTICE(self, prefix, params):        
-        print prefix        
-        print type(self.factory.parent)
+        print prefix                
         for param in params:
             print param             
-            self.factory.parent.AppendText(param+'\n')
-    
-    #def dataReceived(self, line):
-        #pass
+            self.factory.parent.AppendText(param+'\n')    
 
 class STircFactory(protocol.ClientFactory):
     protocol = STirc
@@ -54,6 +59,7 @@ class STircFactory(protocol.ClientFactory):
     def setFavChannels(self,list):
         self.favchan = list
 
+'''
 if __name__=="__main__":
     factory = STircFactory(None,"TomRiddle")
     mylist = ['#vjtians','#tp','nonsense']
@@ -61,3 +67,4 @@ if __name__=="__main__":
     connector = reactor.connectTCP('irc.dejatoons.net',6667,factory)
     reactor.run()  
     print factory.connectedProtocol._get_nickname()  
+'''

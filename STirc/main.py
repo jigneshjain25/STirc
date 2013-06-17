@@ -17,12 +17,16 @@ ID_RIGHT = 300
 ID_SPLITTER1 = 400
 ID_SPLITTER2 = 500
 
+PORT = 6667
+
 class MainScreen(wx.Frame):
     
     def __init__(self, *args, **kwargs):
         super(MainScreen, self).__init__(*args, **kwargs)
 
         self.server_list = []    
+
+        self.port = PORT
 
         self.InitUI()
         
@@ -46,13 +50,11 @@ class MainScreen(wx.Frame):
         
         self.root = self.channel_list.AddRoot("ChannelList")    
 
-        self.middle = middle(self.splitter2,ID_MIDDLE,(594,450))        
-        self.server_list.append(self.AddServerRoot(self.root,ServerRTC(self.middle.chat_panel,'irc.DejaToons.net',6667,'Dejatoons')))
-        self.AddChannelNode(self.server_list[0],ChannelRTC(self.middle.chat_panel,'vjtians','.less','gaurav'))
-        self.AddChannelNode(self.server_list[0],ChannelRTC(self.middle.chat_panel,'scraggy','Pokemon','gaurav'))        
-        self.server_list.append(self.AddServerRoot(self.root,ServerRTC(self.middle.chat_panel,'irc.FreeNode.net',6667,'FreeNode')))
-        self.AddChannelNode(self.server_list[1],ChannelRTC(self.middle.chat_panel,'boost','Maths','gaurav'))
-        self.AddChannelNode(self.server_list[1],ChannelRTC(self.middle.chat_panel,'gsoc','Coding','gaurav'))        
+        self.middle = middle(self.splitter2,ID_MIDDLE,(594,450))      
+
+        dejatoons = ServerRTC(self.middle.chat_panel,self,'irc.DejaToons.net',self.port,'Dejatoons',['#gaurav'])        
+
+        self.server_list.append(self.AddServerRoot(self.root,dejatoons))                
         
         self.channel_list.ExpandAll()        
         
@@ -63,14 +65,16 @@ class MainScreen(wx.Frame):
 
         self.Centre()
         self.Show(True)
-        
-        dejatoons=self.channel_list.GetPyData(self.server_list[0])
+                
+        dejatoons.TreeItemId = self.server_list[0]
         try:
             t=threading.Thread(target=dejatoons.makeConnection)
             t.daemon=True
             t.start()
         except:
             print "Error"
+
+        dejatoon = ServerRTC(self.middle.chat_panel,self,'irc.freenode.net',self.port,'Freenode')
 
     def CreateMenuBar(self):
 
