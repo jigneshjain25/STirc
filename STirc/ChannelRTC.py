@@ -5,11 +5,10 @@ import wx.richtext
 import re
 from time import strftime, localtime
  
- 
 class ChannelRTC (wx.richtext.RichTextCtrl):
     def __init__ (self,parent ,cname, tname, nick, *args, **kwargs):
+        print "Inside channel rtc",parent
         super(ChannelRTC,self).__init__(parent,*args,**kwargs)
-        print "Inside channel rtc"
         self.Hide()
         self.SetSize(wx.GetDisplaySize())        
         self.RedColor = wx.Color(255, 0, 0)

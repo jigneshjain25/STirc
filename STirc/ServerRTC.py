@@ -14,7 +14,6 @@ class ServerRTC(RichTextCtrl):
         self.GetCaret().Hide()         
         self.SetSize(wx.GetDisplaySize())
         self.SetEditable(False)        
-        self.parent=parent
         self.domain=domain
         self.name=name
         self.topic_name=''

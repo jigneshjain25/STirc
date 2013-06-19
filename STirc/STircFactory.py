@@ -2,6 +2,7 @@ from twisted.words.protocols import irc
 from twisted.internet import protocol
 from twisted.internet import reactor
 from ChannelRTC import ChannelRTC
+import wx
 
 class STirc(irc.IRCClient):
     def _get_nickname(self):
@@ -17,8 +18,9 @@ class STirc(irc.IRCClient):
         print "Joined %s." % (channel,)
         MainScreen = self.factory.parent.MainScreen
         srtc = self.factory.parent        
+        MainScreen.middle.chat_panel = wx.Panel(MainScreen.middle,size=(-1,-1),id=-1)
         crtc = ChannelRTC(MainScreen.middle.chat_panel,channel,'newTopic','gaurav')            
-        MainScreen.AddChannelNode(MainScreen.AddChannelNode(srtc.TreeItemId,crtc))
+        MainScreen.AddChannelNode(srtc.TreeItemId,crtc)
         MainScreen.middle.SetChatWindow(crtc)
 
     def topicUpdated(self,user,channel,newTopic):
@@ -39,7 +41,7 @@ class STirc(irc.IRCClient):
 class STircFactory(protocol.ClientFactory):
     protocol = STirc
 
-    def __init__(self,parent ,nickname='twistedTrial'):        
+    def __init__(self,parent,nickname='twistedTrial'):        
         self.nickname = nickname
         self.parent = parent
         self.favchan = []
